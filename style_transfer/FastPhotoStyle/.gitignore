@@ -1,0 +1,14 @@
+segmentation/
+outputs/
+models/
+results/
+images/
+data/
+logs/
+examples
+.idea/
+notebooks/.ipynb_checkpoints/*
+*.tar.gz
+*.zip
+*.pkl
+*.pyc

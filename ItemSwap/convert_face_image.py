@@ -32,7 +32,7 @@ if __name__ == '__main__':
     parser.add_argument('input_fn')
     parser.add_argument('output_fn')
     parser.add_argument('--weights_path',
-                        default='weights_faces_sobchak2all/gan_models/backup_iter40000/')
+                        default='weights_faces/gan_models/')
 
     args = parser.parse_args()
     input_fn = args.input_fn

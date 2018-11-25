@@ -196,6 +196,7 @@ class VideoConverter(object):
         elif options["output_type"] == 3:
             final_result = triple_img  # return input,result and mask heatmap image combin
         cv2.imwrite(output_fn, final_result[:, :, ::-1])
+        print(f'Image saved at {output_fn}, shape {final_result.shape}')
 
     def process_video(self, input_img, options): 
         """Transform detected faces in single input frame."""

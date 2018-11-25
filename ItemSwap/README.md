@@ -2,16 +2,22 @@
 Consist of two part: swapping face and swaping background.
 ## Using
 ### For initialization:
+```
 - git clone https://github.com/EvgenyKashin/ItemSwap.git
 - make docker-build
 - make load-weights
+```
+
+***Important:*** run docker under sudo. Also may be required
+```sudo chmod -R 777 ./*``` (sorry)
 
 ### For training:
 TODO: write instruction
 
 ### For face swap:
+```
 - make convert-face-video
 - make convert-face-image
-- convert-background-image
-
+- make convert-background-image
+```
 For parameters see Makefile

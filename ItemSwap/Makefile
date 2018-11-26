@@ -38,7 +38,7 @@ convert-face-image:
 convert-background-image:
 	${DOCKER_RUN} python convert_background.py --dataroot data_background \
 	--name rick_morty --model cycle_gan --checkpoints_dir weights_background \
-	--results_dir results
+	--results_dir results --resize_or_crop none --loadSize 720
 
 save-weights:
 	zip -r ../gan_weights/weights_faces.zip weights_faces

@@ -14,10 +14,12 @@ Consist of two part: swapping face and swaping background.
 ### For training:
 TODO: write instruction
 
-### For face swap:
+### For face and background swap:
 ```
 - make convert-face-video
 - make convert-face-image
 - make convert-background-image
 ```
 For parameters see Makefile
+
+***Important:*** there is ```loadSize``` parameter in ```make convert-background-image``` for changing image size.

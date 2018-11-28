@@ -1,0 +1,11 @@
+anonymizer_dir: ./images/anonymized
+face_swap_dir: ./images/face_swap
+style_transfer_dir: ./images/style_transfer
+
+
+mtcnn_weights_dir: ./app/ItemSwap/weights_faces/mtcnn_weights/
+face_swap_gan_weights_dir: ./app/ItemSwap/weights_faces/gan_models/
+
+segmentation_weights_dir: ./app/style_transfer/CIHP_master/checkpoint/CIHP_pgn
+cloths_style_transfer_weights_dir: ./app/style_transfer/fast_style_transfer/weights
+background_style_transfer_weight_dir: ./app/ItemSwap/weights_background

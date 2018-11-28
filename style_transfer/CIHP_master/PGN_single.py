@@ -4,7 +4,7 @@ import cv2
 import tensorflow as tf
 from PIL import Image
 import scipy.io as sio
-import utils
+from . import utils
 
 # import contextlib
 import timeit
@@ -153,11 +153,12 @@ class PGN():
                 else:
                     print(" [!] Load failed...")
 
-    def predict(self, img_path):
+    def predict(self, img_path: str):
 
         # if self
         # parsing_, scores, edge_ = self.sess.run([self.pred_scores, self.pred_edge], {'create_inputs/img_path:0': img_path})
-        
+        print('AAAAAAAAAAAAAAAAAAAAAA', img_path)
+        assert os.path.exists(img_path), img_path
         scores = self.sess.run([self.pred_scores], {'create_inputs/img_path:0': img_path})[0][0]
 
         return scores

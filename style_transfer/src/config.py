@@ -1,8 +1,8 @@
 import enum
 
 
-class SegmentationClassNames(enum):
-    ALL = [
+class SegmentationClassNames:
+    ALL = (
         'Background',
         'Hat',
         'Hair',
@@ -22,9 +22,9 @@ class SegmentationClassNames(enum):
         'Left leg',
         'Right leg',
         'Shoes'
-    ]
+    )
 
-    CLOTHS = [
+    CLOTHS = (
         'Hat',
         'Glove',
         'Sunglasses',
@@ -36,18 +36,18 @@ class SegmentationClassNames(enum):
         'Scarf',
         'Skirt',
         'Shoes'
-    ]
+    )
 
-    BACKGROUND = [
+    BACKGROUND = (
         'Background'
-    ]
+    )
 
 
-class Styles(enum):
+class Styles(enum.Enum):
     HELL = 'Hell'
     ART = 'Art'
 
 
-class SupportedStyles(enum):
+class SupportedStyles(enum.Enum):
     NVIDIA = {Styles.HELL}
     FAST_STYLE_TRANSFER = {Styles.ART}

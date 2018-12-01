@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import json
 import yaml
 
+import flask
 from flask import render_template
 from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_class
 from flask_wtf import FlaskForm
@@ -20,35 +22,25 @@ with open('app/paths.yml', 'r') as f:
 anonymizer = Anonymizer(paths_config)
 
 
-#
-# def make_style_transfer(filename):
-#     DESTINATION = 'images/style_transfer'
-#     os.makedirs(DESTINATION, exist_ok=True)
-#     destination_filename = os.path.join(DESTINATION, os.path.basename(filename))
-#
-#     # img = cv2.imread(filename)
-#     # assert img is not None, filename
-#     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#
-#     img, _ = style_transfer.alter_cloths(filename)
-#     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-#     cv2.imwrite(destination_filename, img)
-#
-#     img, _ = style_transfer.alter_background(destination_filename)
-#     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-#     cv2.imwrite(destination_filename, img)
-#
-#     return destination_filename
-
-
 class UploadForm(FlaskForm):
     photo = FileField(validators=[FileAllowed(photos, u'Image only!'), FileRequired(u'File was empty!')])
+    submit = SubmitField('Upload')
+
+
+class EditingForm(FlaskForm):
+    # photo = FileField(validators=[FileAllowed(photos, u'Image only!'), FileRequired(u'File was empty!')])
 
     if_do_face_swap = BooleanField(label='Face Swap')
     if_do_cloths_style_transfer = BooleanField(label='Cloths Style Transfer')
     if_do_background_style_transfer = BooleanField(label='Background Style Transfer')
 
-    submit = SubmitField(u'Upload')
+    submit = SubmitField('Upload')
+
+    # submit_coat_jeans = SubmitField(u'Upper Cloths to Jeans')
+    # submit_color_shoes = SubmitField(u'Color Shoes')
+    # submit_pants_skin = SubmitField(u'Pants to Crocodile Skin')
+    # submit_coat_skin = SubmitField(u'Coat to Crocodile Skin')
+    # submit_upper_udnie = SubmitField(u'Coat to Crocodile Skin')
 
     def get_deep_anonymizer_actions(self):
         return {
@@ -63,6 +55,17 @@ def upload_file():
     form = UploadForm()
     if form.validate_on_submit():
         init_image_path = photos.save(form.photo.data, folder='./images/upload')
+        return flask.redirect(flask.url_for('edit', messages=json.dumps({'path': init_image_path})))
+    else:
+        return render_template('index.html', form=form)
+
+
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+    form = EditingForm()
+    if form.validate_on_submit():
+        # init_image_path = photos.save(form.photo.data, folder='./images/upload')
+        init_image_path = flask.request.args['messages']
         init_image_url = photos.url(init_image_path)
 
         anon_image_path = anonymizer.anonymize(image_path=init_image_path,

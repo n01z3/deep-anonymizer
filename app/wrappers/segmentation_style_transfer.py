@@ -32,11 +32,11 @@ class SegmentationStyleTransfer:
         segmentation_mask = self._get_segmentation_mask(image)
 
         found_classes = self._get_found_cloths_classes(segmentation_mask)
-        num_styles = 8
+        num_styles = 7
 
         res = np.zeros(shape=(num_styles * image.shape[0], len(found_classes) * image.shape[1], 3), dtype=np.uint8)
 
-        for i, style in enumerate(('jeans', 'leopard', 'udnie', 'scream', 'la_muse', 'wave', 'rain_princess', 'wreck')):
+        for i, style in enumerate(('jeans', 'leopard', 'udnie', 'scream', 'la_muse', 'wave', 'rain_princess')):
             for j, seg_cls in enumerate(found_classes):
 
                 transfered_image = self._get_cloths_style_transfer(image, style)
@@ -54,7 +54,9 @@ class SegmentationStyleTransfer:
                 res[i * image.shape[0]: (i + 1) * image.shape[0],
                 j * image.shape[1]: (j + 1) * image.shape[1]] = morphed
 
-        res = cv2.resize(res, (image.shape[1] * 2, image.shape[0] * 2))
+        res = cv2.resize(res, (int(res.shape[1] / 3.), int(res.shape[0] / 3.)))
+
+        print('AAAA INIT SHAPE {}   RES SHAPE {}'.format(image.shape, res.shape))
         return res
 
         # if cloths:

@@ -30,27 +30,62 @@ class SegmentationStyleTransfer:
             return image
 
         segmentation_mask = self._get_segmentation_mask(image)
-        modified_image = image.copy()
 
-        if cloths:
-            style_transfer_image = self._get_cloths_style_transfer(image)
-            modified_image, _ = self._morph_transforms(
-                initial_image=modified_image,
-                transformed_image=style_transfer_image,
-                segmentation_mask=segmentation_mask,
-                areas=segmentation_config.SegmentationClassNames.CLOTHS
-            )
+        found_classes = self._get_found_cloths_classes(segmentation_mask)
+        num_styles = 8
 
-        if background:
-            style_transfer_image = self._get_background_style_transfer(image)
-            modified_image, _ = self._morph_transforms(
-                initial_image=modified_image,
-                transformed_image=style_transfer_image,
-                segmentation_mask=segmentation_mask,
-                areas=segmentation_config.SegmentationClassNames.BACKGROUND
-            )
+        res = np.zeros(shape=(num_styles * image.shape[0], len(found_classes) * image.shape[1], 3), dtype=np.uint8)
 
-        return modified_image
+        for i, style in enumerate(('jeans', 'leopard', 'udnie', 'scream', 'la_muse', 'wave', 'rain_princess', 'wreck')):
+            for j, seg_cls in enumerate(found_classes):
+
+                transfered_image = self._get_cloths_style_transfer(image, style)
+                if image.shape != transfered_image.shape:
+                    transfered_image = cv2.resize(transfered_image, tuple(reversed(image.shape[:2])))
+
+                morphed, _ = self._morph_transforms(initial_image=image.copy(),
+                                                    transformed_image=transfered_image,
+                                                    segmentation_mask=segmentation_mask,
+                                                    areas=[seg_cls])
+
+                morphed = cv2.putText(morphed, seg_cls, (0, morphed.shape[0] - 10),
+                                      cv2.FONT_HERSHEY_SIMPLEX, 5, (255, 255, 255))
+
+                res[i * image.shape[0]: (i + 1) * image.shape[0],
+                j * image.shape[1]: (j + 1) * image.shape[1]] = morphed
+
+        res = cv2.resize(res, (image.shape[1] * 2, image.shape[0] * 2))
+        return res
+
+        # if cloths:
+        #     style_transfer_image = self._get_cloths_style_transfer(image)
+        #     modified_image, _ = self._morph_transforms(
+        #         initial_image=modified_image,
+        #         transformed_image=style_transfer_image,
+        #         segmentation_mask=segmentation_mask,
+        #         areas=segmentation_config.SegmentationClassNames.CLOTHS
+        #     )
+        #
+        # if background:
+        #     style_transfer_image = self._get_background_style_transfer(image)
+        #     modified_image, _ = self._morph_transforms(
+        #         initial_image=modified_image,
+        #         transformed_image=style_transfer_image,
+        #         segmentation_mask=segmentation_mask,
+        #         areas=segmentation_config.SegmentationClassNames.BACKGROUND
+        #     )
+        #
+        # return modified_image
+
+    def _get_found_cloths_classes(self, mask):
+        found = []
+        for index, class_name in enumerate(segmentation_config.SegmentationClassNames.ALL):
+            if class_name not in segmentation_config.SegmentationClassNames.CLOTHS:
+                continue
+            if (mask != index).all():
+                continue
+            found.append(class_name)
+        return found
 
     def _get_segmentation_mask(self, image):
         _, in_path = tempfile.mkstemp(suffix='.png', dir=self._DIR)
@@ -58,25 +93,32 @@ class SegmentationStyleTransfer:
         mask, _ = self._segmentation_model.predict(in_path)
         return mask
 
-    def _get_cloths_style_transfer(self, image):
+    def _get_cloths_style_transfer(self, image, style):
         _, in_path = tempfile.mkstemp(suffix='.png', dir=self._DIR)
         utils.save_image(in_path, image)
+
+        if style == 'jeans':
+            checkpoint_dir = '/home/ikibardin/Kaggle/fast-style-transfer/my_checkpoints/jeans1/'
+        elif style == 'leopard':
+            checkpoint_dir = '/home/ikibardin/Kaggle/fast-style-transfer/my_checkpoints/leopard'
+        else:
+            checkpoint_dir = os.path.join(self._cloths_style_transfer_weights_dir, '{}.ckpt'.format(style))
 
         _, out1_path = tempfile.mkstemp(suffix='.png', dir=self._DIR)
         ffwd_to_img(
             in_path=in_path, out_path=out1_path,
-            checkpoint_dir=os.path.join(self._cloths_style_transfer_weights_dir, 'udnie.ckpt'),
+            checkpoint_dir=checkpoint_dir,
             device=DEVICE
         )
 
-        _, out2_path = tempfile.mkstemp(suffix='.png', dir=self._DIR)
-        ffwd_to_img(
-            in_path=out1_path, out_path=out2_path,
-            checkpoint_dir=os.path.join(self._cloths_style_transfer_weights_dir, 'la_muse.ckpt'),
-            device=DEVICE
-        )
+        # _, out2_path = tempfile.mkstemp(suffix='.png', dir=self._DIR)
+        # ffwd_to_img(
+        #     in_path=out1_path, out_path=out2_path,
+        #     checkpoint_dir=os.path.join(self._cloths_style_transfer_weights_dir, 'la_muse.ckpt'),
+        #     device=DEVICE
+        # )
 
-        return utils.load_image(out2_path)
+        return utils.load_image(out1_path)
 
     def _get_background_style_transfer(self, image):
         in_dir = tempfile.mkdtemp(dir=self._DIR)

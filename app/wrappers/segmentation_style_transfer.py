@@ -39,12 +39,12 @@ class SegmentationStyleTransfer:
         for i, style in enumerate(('jeans', 'leopard', 'udnie', 'scream', 'la_muse', 'wave', 'rain_princess', 'wreck')):
             for j, seg_cls in enumerate(found_classes):
 
-                transfered_image = self._get_cloths_style_transfer(image, style)
-                if image.shape != transfered_image.shape:
-                    transfered_image = cv2.resize(transfered_image, tuple(reversed(image.shape[:2])))
+                transferred_image = self._get_cloths_style_transfer(image, style)
+                if image.shape != transferred_image.shape:
+                    transferred_image = cv2.resize(transferred_image, tuple(reversed(image.shape[:2])))
 
                 morphed, _ = self._morph_transforms(initial_image=image.copy(),
-                                                    transformed_image=transfered_image,
+                                                    transformed_image=transferred_image,
                                                     segmentation_mask=segmentation_mask,
                                                     areas=[seg_cls])
 

@@ -1,0 +1,3 @@
+/home/ikibardin/deep-anonymizer/generative_inpainting/example.jpg
+/home/ikibardin/deep-anonymizer/generative_inpainting/example.jpg
+

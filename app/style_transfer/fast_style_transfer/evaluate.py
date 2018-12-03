@@ -66,6 +66,79 @@ def ffwd_video(path_in, path_out, checkpoint_dir, device_t='/gpu:0', batch_size=
         video_writer.close()
 
 
+class MyWrapper:
+    def __init__(self, checkpoint_dir):
+        self._checkpoint_dir = checkpoint_dir
+
+        self._g = tf.Graph()
+        soft_config = tf.ConfigProto(allow_soft_placement=True)
+        soft_config.gpu_options.allow_growth = True
+
+        print('AAAAAAAAAAAAAAA ', checkpoint_dir)
+        with self._g.as_default(), self._g.device('/gpu:0'):
+            img_shape = (1024, 1024, 3)
+            self._batch_shape = (1,) + img_shape
+            self._img_placeholder = tf.placeholder(tf.float32, shape=self._batch_shape,
+                                                   name='img_placeholder')
+
+            self._preds = transform.net(self._img_placeholder)
+
+            saver = tf.train.Saver()
+            self._sess = tf.Session(config=soft_config)
+
+            if os.path.isdir(checkpoint_dir):
+                ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
+                if ckpt and ckpt.model_checkpoint_path:
+                    saver.restore(self._sess, ckpt.model_checkpoint_path)
+                else:
+                    raise Exception("No checkpoint found...")
+            else:
+                saver.restore(self._sess, checkpoint_dir)
+
+    def transform_many(self, data_in, paths_out):
+        assert len(paths_out) > 0
+        is_paths = type(data_in[0]) == str
+        if is_paths:
+            assert len(data_in) == len(paths_out)
+            img_shape = get_img(data_in[0]).shape
+        else:
+            assert data_in.size[0] == len(paths_out)
+            img_shape = X[0].shape
+
+        batch_size = min(len(paths_out), 1)
+
+        with self._g.as_default(), self._g.device('/gpu:0'):
+
+            num_iters = int(len(paths_out) / batch_size)
+            for i in range(num_iters):
+                pos = i * batch_size
+                curr_batch_out = paths_out[pos:pos + batch_size]
+                if is_paths:
+                    curr_batch_in = data_in[pos:pos + batch_size]
+                    X = np.zeros(self._batch_shape, dtype=np.float32)
+                    for j, path_in in enumerate(curr_batch_in):
+                        img = get_img(path_in)
+                        assert img.shape == img_shape, \
+                            'Images have different dimensions. ' + \
+                            'Resize images or use --allow-different-dimensions.'
+                        X[j] = img
+                else:
+                    X = data_in[pos:pos + batch_size]
+
+                _preds = self._sess.run(self._preds, feed_dict={self._img_placeholder: X})
+                for j, path_out in enumerate(curr_batch_out):
+                    save_img(path_out, _preds[j])
+
+            remaining_in = data_in[num_iters * batch_size:]
+            remaining_out = paths_out[num_iters * batch_size:]
+        if len(remaining_in) > 0:
+            self.transform_many(remaining_in, remaining_out)
+
+    def transform_single(self, in_path, out_path):
+        paths_in, paths_out = [in_path], [out_path]
+        return self.transform_many(paths_in, paths_out)
+
+
 # get img_shape
 def ffwd(data_in, paths_out, checkpoint_dir, device_t='/gpu:0', batch_size=4):
     assert len(paths_out) > 0
@@ -73,6 +146,7 @@ def ffwd(data_in, paths_out, checkpoint_dir, device_t='/gpu:0', batch_size=4):
     if is_paths:
         assert len(data_in) == len(paths_out)
         img_shape = get_img(data_in[0]).shape
+        # print('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ ', img_shape)
     else:
         assert data_in.size[0] == len(paths_out)
         img_shape = X[0].shape

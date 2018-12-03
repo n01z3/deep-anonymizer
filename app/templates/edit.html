@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<title>Deep Anonymizer Demo</title>
+<h1>Deep Anonymizer Demo</h1>
+
+
+{% if initial_file_url %}
+<br>
+<img src="{{ initial_file_url }}">
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    <br> {{ form.hidden_tag() }} <br>
+    <br> {{ form.pants_to_jeans }}<br>
+    <br> {{ form.pants_to_skin }}<br>
+    <br> {{ form.coat_to_jeans }}<br>
+    <br> {{ form.coat_to_skin }}<br>
+    <br> {{ form.colorize_shoes }}<br>
+    <br> {{ form.colorize_dress }}<br>
+    <br><br> {{ form.return_to_upload }}<br><br>
+
+
+</form>
+
+
+{% if modified_file_url %}
+<br>
+<img src="{{ modified_file_url }}">
+{% endif %}

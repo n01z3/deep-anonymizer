@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 import torch
 import torch.nn as nn
-from models import VGGEncoder, VGGDecoder
+from .models import VGGEncoder, VGGDecoder
 
 
 class PhotoWCT(nn.Module):
@@ -97,8 +97,8 @@ class PhotoWCT(nn.Module):
                 cont_indi = torch.LongTensor(cont_mask[0])
                 styl_indi = torch.LongTensor(styl_mask[0])
                 if self.is_cuda:
-                    cont_indi = cont_indi.cuda(0)
-                    styl_indi = styl_indi.cuda(0)
+                    cont_indi = cont_indi.cuda(1)
+                    styl_indi = styl_indi.cuda(1)
 
                 cFFG = torch.index_select(cont_feat_view, 1, cont_indi)
                 sFFG = torch.index_select(styl_feat_view, 1, styl_indi)
@@ -128,7 +128,7 @@ class PhotoWCT(nn.Module):
         
         iden = torch.eye(cFSize[0])  # .double()
         if self.is_cuda:
-            iden = iden.cuda()
+            iden = iden.cuda(1)
         
         contentConv = torch.mm(cont_feat, cont_feat.t()).div(cFSize[1] - 1) + iden
         # del iden

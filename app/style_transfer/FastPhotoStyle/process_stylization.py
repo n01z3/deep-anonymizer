@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 import torchvision.utils as utils
 import torch.nn as nn
 import torch
-from smooth_filter import smooth_filter
+from .smooth_filter import smooth_filter
 
 
 class ReMapping:
@@ -83,9 +83,9 @@ def stylization(stylization_module, smoothing_module, content_image_path, style_
         styl_img = transforms.ToTensor()(styl_img).unsqueeze(0)
 
         if cuda:
-            cont_img = cont_img.cuda(0)
-            styl_img = styl_img.cuda(0)
-            stylization_module.cuda(0)
+            cont_img = cont_img.cuda(1)
+            styl_img = styl_img.cuda(1)
+            stylization_module.cuda(1)
 
         # cont_img = Variable(cont_img, volatile=True)
         # styl_img = Variable(styl_img, volatile=True)

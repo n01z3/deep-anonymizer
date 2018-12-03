@@ -40,7 +40,7 @@ class SegmentationModel:
         image = Image.open(image_path)
         labeled_image = np.array(preds2coloredseg(probs, image, out_format='gray'),
                                  dtype=np.uint8)
-        return labeled_image, confidences
+        return labeled_image, probs
 
     @staticmethod
     def _softmax(x, axis=0):

@@ -2,18 +2,8 @@
 <title>Deep Anonymizer Demo</title>
 <h1>Deep Anonymizer Demo</h1>
 
-<!--{% block content %}-->
-<!--<h1>Set GAY</h1>-->
-
-<!--&lt;!&ndash;<form method="POST" action="/">&ndash;&gt;-->
-    <!--&lt;!&ndash;<div> </div>&ndash;&gt;-->
-<!--&lt;!&ndash;</form>&ndash;&gt;-->
-<!--{% endblock %}-->
 
 <form method="POST" enctype="multipart/form-data">
-    <br> {{ form.if_do_face_swap.label }} {{ form.if_do_face_swap }}<br>
-    <br> {{ form.if_do_cloths_style_transfer.label }} {{ form.if_do_cloths_style_transfer }}<br>
-    <br> {{ form.if_do_background_style_transfer.label }} {{ form.if_do_background_style_transfer }}<br>
     <br> {{ form.hidden_tag() }} <br>
     {{ form.photo }}
     {% for error in form.photo.errors %}
@@ -22,13 +12,12 @@
     {{ form.submit }}
 </form>
 
-{% if initial_file_url %}
+{% if main_image_url %}
 <br>
-<img src="{{ initial_file_url }}">
+<img src="{{ main_image_url }}">
 {% endif %}
 
-{% if modified_file_url %}
+{% if bottom_image_url %}
 <br>
-<img src="{{ modified_file_url }}">
+<img src="{{ bottom_image_url }}">
 {% endif %}
-

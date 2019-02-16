@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<title>Deep Anonymizer Demo</title>
-<h1>Deep Anonymizer Demo</h1>
+<title>Simple Flask Demo</title>
+<h1>Simple Flask Demo</h1>
 
 
 <form method="POST" enctype="multipart/form-data">
     <br> {{ form.hidden_tag() }} <br>
     {{ form.photo }}
     {% for error in form.photo.errors %}
-    <span style="color: red;">{{ error }}</span>
+        <span style="color: red;">{{ error }}</span>
     {% endfor %}
     {{ form.submit }}
 </form>
 
-{% if main_image_url %}
-<br>
-<img src="{{ main_image_url }}">
+{% if uploaded_image_url %}
+    <h2>Uploaded Image</h2>
+    <img src="{{ uploaded_image_url }}">
 {% endif %}
 
-{% if bottom_image_url %}
-<br>
-<img src="{{ bottom_image_url }}">
+{% if transformed_image_url %}
+    <h2>Transformed Image</h2>
+    <img src="{{ transformed_image_url }}">
 {% endif %}

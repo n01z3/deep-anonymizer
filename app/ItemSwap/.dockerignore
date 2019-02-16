@@ -1,7 +1,0 @@
-/data*
-/celebA
-/cache
-/align_celeba
-*.mp4
-*/*/*.mp4
-/weights*
